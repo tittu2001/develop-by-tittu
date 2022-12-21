@@ -1,0 +1,44 @@
+#Importing necessary packages
+import os
+import json
+import sqlite3
+
+#Connecting to database
+conn = sqlite3.connect('ecommerce.db')
+
+#Creating the database
+if not os.path.exists('ecommerce.db'):
+    conn.execute('''CREATE TABLE products
+                (id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                price REAL NOT NULL,
+                description TEXT NOT NULL,
+                image_url TEXT NOT NULL)''')
+
+#Inserting data into database
+def insert_product(name, price, description, image_url):
+    conn.execute('''INSERT INTO products
+                (name, price, description, image_url)
+                VALUES (?, ?, ?, ?)''',
+            (name, price, description, image_url))
+
+#Add products to database
+insert_product('iPhone 12 Pro Max', 999.99, 'The latest and greatest iPhone model', 'https://example.com/iphone.jpg')
+insert_product('Samsung Galaxy S20', 899.99, 'The latest and greatest Samsung model', 'https://example.com/samsung.jpg')
+
+#Retrieve all products from the database
+def get_all_products():
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM products;")
+    products = cur.fetchall()
+    return products
+
+#Print all products
+products = get_all_products()
+for product in products:
+    product_json = json.dumps(product)
+    print(product_json)
+
+#Commit changes and close the database connection
+conn.commit()
+conn.close()
